@@ -296,6 +296,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   /* Tabla clientes dentro del grupo */
   .vendedor-clientes table { border-radius: 0; border: none; }
   .vendedor-clientes thead th { background: var(--surface2); border-top: none; }
+
+  .dia-btn {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; color: var(--muted); padding: 6px 16px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    font-family: var(--font); transition: all .15s;
+  }
+  .dia-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .dia-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 </style>
 </head>
 <body>
@@ -318,6 +327,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   <div class="tab active" onclick="showTab('dashboard')">📊 Resumen</div>
   <div class="tab" onclick="showTab('clientes')">👥 Clientes</div>
   <div class="tab" onclick="showTab('urgentes')">🔴 Urgentes</div>
+  <div class="tab" onclick="showTab('visitas')">📅 Días de visita</div>
 
 </div>
 
@@ -375,6 +385,30 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     </div>
   </div>
 
+
+  <!-- ── VISITAS ── -->
+  <div id="tab-visitas" class="view">
+    <div class="search-bar" style="margin-bottom:16px;align-items:center;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;flex:1">
+        <button class="dia-btn active" onclick="selectDia('LUNES',this)">Lunes</button>
+        <button class="dia-btn" onclick="selectDia('MARTES',this)">Martes</button>
+        <button class="dia-btn" onclick="selectDia('MIERCOLES',this)">Miércoles</button>
+        <button class="dia-btn" onclick="selectDia('JUEVES',this)">Jueves</button>
+        <button class="dia-btn" onclick="selectDia('VIERNES',this)">Viernes</button>
+        <button class="dia-btn" onclick="selectDia('SABADO',this)">Sábado</button>
+      </div>
+      <button class="btn-ok" onclick="exportarDia()">⬇️ Exportar día para chofer</button>
+    </div>
+    <div id="visitas-resumen" style="margin-bottom:14px"></div>
+    <div class="table-wrap">
+      <table id="table-visitas">
+        <thead><tr>
+          <th>#</th><th>Cliente</th><th>Vendedor</th><th>Saldo pendiente</th><th>Última factura</th><th>Días pendientes</th><th>Estado</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
 </main>
 
 <!-- ── DETALLE CLIENTE (overlay tipo página) ── -->
@@ -1508,6 +1542,126 @@ document.querySelectorAll('.overlay').forEach(el => {
     if (e.target === this) this.classList.remove('open');
   });
 });
+
+
+// ═══════════════════════════════════════════════════════
+// DÍAS DE VISITA
+// ═══════════════════════════════════════════════════════
+
+const VISITAS = {
+  "LUNES": ["ANA MARIA HUMACATA", "CRISTIAN CARRISO", "DESPENSA GUILLE", "GUTIERREZ SUSANA", "ROSALES ISABEL", "VACA EMILSE", "VERA MONICA", "ACOSTA CYNTHIA", "CAROLINA BLANCO", "DE TAFI GRANJA", "DESPENSA MIA", "GERONIMO MARINA TAUI TAUI", "PANADERIA CONSTITUCION", "PANADERIA ROCA", "SACABA LEYLA", "ALVAREZ FATIMA", "ANDRES PAOLA", "CINTIA LEIVA", "GALVAN DELICIA", "LARA ACEVEDO", "MARIA PEREYRA", "PONCE RUBEN", "PUNTANO ANA"],
+  "MARTES": ["AMADO VANESA", "CECANTI MARIA", "ESPINOSA MARIO", "GALLARDO CLAUDIA", "JUANA VILLA", "ROMANO DULIO", "DALMA VEGA(SCOBAR SILVINA)", "ESCOBAR SILVINA", "URUEÑA PAMELA", "VARELA CRISTINA"],
+  "MIERCOLES": ["JAPAZE RODOLFO WILSON", "MUTHUAN  RIOJA", "ACOSTA MARIA CRISTINA", "ALVARADO NELIDA", "BRITO NOELIA", "GARCIA JOSE ANTONIO", "GARGIULO CLAUDIA", "LARA CLAUDIA", "LIZARRAGA MAYRA", "ROMANO ALEJANDRA", "SORAIRE MARCELO", "VILLAGRA AURI", "JIMENEZ RAUL", "PATRICIO MAMANI", "PONCE LUIS", "ROSA CISNERO"],
+  "JUEVES": ["LEDESMA MARGARITA", "ANTONIA CAZORLA", "ARIZANA TIENDA DE BEBIDAS", "DESPENSA FELIPE", "DIAZ SILVINA", "GOMEZ RAMON", "PONCE RICARDO", "ROLDAN FERNANDA", "AGUSTINA OLEA", "ELBA MARTINEZ", "JULIAN SARACHO", "MARCELA LOPEZ", "SAUCE DIEGO", "SKINARI MARIA"],
+  "VIERNES": ["SANA CAROLINA GODOY", "FRIAS MARGARITA", "PALAVECINO LORENA", "PAZ VIVIANA", "ASKA EVA", "AVELLANEDA GRACIELA", "BRANDAN BEATRIZ", "GALVAN ISABEL( MIS 2  SOLES)", "MAGUI SALVATIERRA", "DE SEVILLA ANA", "ELIAS PALAVECINO", "JIMENEZ VANESA", "MORALES OSCAR", "RUIZ DELIA"],
+  "SABADO": ["MINISERVI DMC", "NIEVA PABLO", "RANDAZZO JUAN (POLL.R)", "ROLO CORBALA", "SERGIO ARAOZ", "TERAN ANA", "ARANDA LEYLA PAULINA", "JORRAT EMILIA", "LAZARTE MARIA", "RAMOS YULI", "ROLDAN JORGE", "TESSARI MARIA VIRGINIA", "ZELAYA SONIA", "ACOSTA LUIS", "CLARA ROSA PEREZ", "MARCHETTI MABEL", "PEREA SEGUNDO", "SCOLA DENIS"],
+};
+
+let diaSeleccionado = 'LUNES';
+
+function selectDia(dia, btn) {
+  diaSeleccionado = dia;
+  document.querySelectorAll('.dia-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderVisitas();
+}
+
+function renderVisitas() {
+  const tbody = document.querySelector('#table-visitas tbody');
+  const resumenEl = document.getElementById('visitas-resumen');
+  if (!tbody) return;
+  const nombresDelDia = VISITAS[diaSeleccionado] || [];
+  const normalizar = s => s.toUpperCase().replace(/\s+/g, ' ').trim();
+  const diasNombre = { LUNES:'Lunes', MARTES:'Martes', MIERCOLES:'Miércoles', JUEVES:'Jueves', VIERNES:'Viernes', SABADO:'Sábado' };
+
+  const filas = nombresDelDia.map((nombreVisita, idx) => {
+    const cliente = data.clientes.find(c => normalizar(c.nombre) === normalizar(nombreVisita));
+    if (!cliente) {
+      return { idx: idx+1, nombre: nombreVisita, vendedor:'—', saldo:null, ultimaFactura:null, dias:null, estado:'<span class="badge badge-neutral">Sin datos</span>', clienteId:null };
+    }
+    const s = getClienteStats(cliente.id);
+    return { idx:idx+1, nombre:cliente.nombre, vendedor:getVendedorNombre(cliente.vendedorId), saldo:s.saldo, ultimaFactura:s.ultimaFactura, dias:s.dias, estado:estadoBadge(s.saldo, s.dias), clienteId:cliente.id };
+  });
+
+  const conSaldo = filas.filter(f => f.saldo !== null && f.saldo > 0);
+  const totalSaldo = conSaldo.reduce((s,f) => s + f.saldo, 0);
+  const urgentes = filas.filter(f => f.saldo > 0 && f.dias !== null && f.dias > 7).length;
+
+  resumenEl.innerHTML = `
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div class="stat-card accent" style="flex:none;padding:12px 18px;min-width:auto">
+        <div class="label">Clientes — ${diasNombre[diaSeleccionado]}</div>
+        <div class="value" style="font-size:20px">${nombresDelDia.length}</div>
+      </div>
+      <div class="stat-card warn" style="flex:none;padding:12px 18px;min-width:auto">
+        <div class="label">Total a cobrar</div>
+        <div class="value" style="font-size:18px">${fmtMoney(totalSaldo)}</div>
+      </div>
+      <div class="stat-card urgent" style="flex:none;padding:12px 18px;min-width:auto">
+        <div class="label">Urgentes del día</div>
+        <div class="value" style="font-size:20px">${urgentes}</div>
+      </div>
+    </div>`;
+
+  if (!filas.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">📅</div><p>Sin clientes asignados.</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filas.map(f => `
+    <tr style="${f.clienteId ? 'cursor:pointer' : 'opacity:.7'}" ${f.clienteId ? `onclick="openDetail('${f.clienteId}')"` : ''}>
+      <td style="color:var(--muted);font-size:12px;width:36px">${f.idx}</td>
+      <td><strong>${f.nombre}</strong></td>
+      <td>${f.vendedor}</td>
+      <td class="amount ${f.saldo > 0 ? 'debt' : f.saldo === 0 ? 'zero' : ''}">${f.saldo !== null ? fmtMoney(f.saldo) : '—'}</td>
+      <td>${fmtDate(f.ultimaFactura)}</td>
+      <td>${f.dias !== null ? `<span class="badge ${f.dias > 7 ? 'badge-urgent' : f.dias >= 5 ? 'badge-warn' : 'badge-blue'}">${f.dias}d</span>` : '—'}</td>
+      <td>${f.estado}</td>
+    </tr>`).join('');
+
+  tbody.innerHTML += `<tr style="background:var(--surface2);border-top:2px solid var(--border)">
+    <td colspan="3" style="padding:10px 12px;font-weight:700">TOTAL A COBRAR</td>
+    <td class="amount debt" style="font-weight:800;font-size:15px">${fmtMoney(totalSaldo)}</td>
+    <td colspan="3" style="padding:10px 12px;color:var(--muted);font-size:12px">${conSaldo.length} clientes con saldo</td>
+  </tr>`;
+}
+
+function exportarDia() {
+  const nombresDelDia = VISITAS[diaSeleccionado] || [];
+  const normalizar = s => s.toUpperCase().replace(/\s+/g, ' ').trim();
+  const diasNombre = { LUNES:'Lunes', MARTES:'Martes', MIERCOLES:'Miércoles', JUEVES:'Jueves', VIERNES:'Viernes', SABADO:'Sábado' };
+  const fecha = new Date().toLocaleDateString('es-AR');
+
+  const rows = [
+    [`HOJA DE COBROS — ${diasNombre[diaSeleccionado].toUpperCase()} ${fecha}`],
+    [],
+    ['#','CLIENTE','VENDEDOR','SALDO PENDIENTE','ÚLTIMA FACTURA','DÍAS PEND.','ESTADO','COBRADO $','OBSERVACIONES']
+  ];
+
+  let totalSaldo = 0;
+  nombresDelDia.forEach((nombreVisita, i) => {
+    const cliente = data.clientes.find(c => normalizar(c.nombre) === normalizar(nombreVisita));
+    if (!cliente) {
+      rows.push([i+1, nombreVisita, '—', '', '', '', 'SIN DATOS EN SISTEMA', '', '']);
+      return;
+    }
+    const s = getClienteStats(cliente.id);
+    if (s.saldo > 0) totalSaldo += s.saldo;
+    const estadoTexto = s.saldo <= 0 ? 'SALDADO' : (s.dias > 7 ? 'URGENTE' : s.dias >= 5 ? 'PRÓXIMO' : 'AL DÍA');
+    rows.push([i+1, cliente.nombre, getVendedorNombre(cliente.vendedorId),
+      s.saldo > 0 ? s.saldo : 0, s.ultimaFactura || '', s.dias || '', estadoTexto, '', '']);
+  });
+
+  rows.push([]);
+  rows.push(['','','TOTAL A COBRAR', totalSaldo, '','','','','']);
+
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [{wch:4},{wch:32},{wch:12},{wch:18},{wch:15},{wch:11},{wch:10},{wch:14},{wch:24}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, diasNombre[diaSeleccionado]);
+  XLSX.writeFile(wb, `Cobros_${diasNombre[diaSeleccionado]}_${new Date().toISOString().split('T')[0]}.xlsx`);
+  toast(`Hoja de cobros ${diasNombre[diaSeleccionado]} exportada ✓`, 'ok');
+}
 
 // ═══════════════════════════════════════════════════════
 // INIT — cargar datos del Excel subido inicialmente
