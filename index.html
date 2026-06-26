@@ -855,6 +855,7 @@ function renderClientes() {
     const saldoTotal = totalDebe - totalHaber;
     const urgentes   = clientes.filter(c => { const s = getClienteStats(c.id); return s.saldo > 0 && s.dias !== null && s.dias > 7; }).length;
 
+    clientes.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', {sensitivity:'base'}));
     const filas = clientes.map(c => {
       const s = getClienteStats(c.id);
       return `
