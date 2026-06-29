@@ -364,6 +364,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <option value="">Todos los vendedores</option>
       </select>
     </div>
+    <div style="margin-bottom:10px;display:flex;justify-content:flex-end">
+      <button class="btn-ok" onclick="exportarUrgentes()">⬇️ Exportar estados de cuenta</button>
+    </div>
     <div id="urgentes-resumen" style="margin-bottom:14px"></div>
     <div class="table-wrap">
       <table id="table-urgentes">
@@ -1550,12 +1553,12 @@ document.querySelectorAll('.overlay').forEach(el => {
 // ═══════════════════════════════════════════════════════
 
 const VISITAS = {
-  "LUNES": ["ANA MARIA HUMACATA", "CRISTIAN CARRISO", "DESPENSA GUILLE", "GUTIERREZ SUSANA", "ROSALES ISABEL", "VACA EMILSE", "VERA MONICA", "ACOSTA CYNTHIA", "CAROLINA BLANCO", "DE TAFI GRANJA", "DESPENSA MIA", "GERONIMO MARINA TAUI TAUI", "PANADERIA CONSTITUCION", "PANADERIA ROCA", "SACABA LEYLA", "ALVAREZ FATIMA", "ANDRES PAOLA", "CINTIA LEIVA", "GALVAN DELICIA", "LARA ACEVEDO", "MARIA PEREYRA", "PONCE RUBEN", "PUNTANO ANA"],
-  "MARTES": ["AMADO VANESA", "CECANTI MARIA", "ESPINOSA MARIO", "GALLARDO CLAUDIA", "JUANA VILLA", "ROMANO DULIO", "DALMA VEGA(SCOBAR SILVINA)", "ESCOBAR SILVINA", "URUEÑA PAMELA", "VARELA CRISTINA"],
-  "MIERCOLES": ["JAPAZE RODOLFO WILSON", "MUTHUAN  RIOJA", "ACOSTA MARIA CRISTINA", "ALVARADO NELIDA", "BRITO NOELIA", "GARCIA JOSE ANTONIO", "GARGIULO CLAUDIA", "LARA CLAUDIA", "LIZARRAGA MAYRA", "ROMANO ALEJANDRA", "SORAIRE MARCELO", "VILLAGRA AURI", "JIMENEZ RAUL", "PATRICIO MAMANI", "PONCE LUIS", "ROSA CISNERO"],
-  "JUEVES": ["LEDESMA MARGARITA", "ANTONIA CAZORLA", "ARIZANA TIENDA DE BEBIDAS", "DESPENSA FELIPE", "DIAZ SILVINA", "GOMEZ RAMON", "PONCE RICARDO", "ROLDAN FERNANDA", "AGUSTINA OLEA", "ELBA MARTINEZ", "JULIAN SARACHO", "MARCELA LOPEZ", "SAUCE DIEGO", "SKINARI MARIA"],
-  "VIERNES": ["SANA CAROLINA GODOY", "FRIAS MARGARITA", "PALAVECINO LORENA", "PAZ VIVIANA", "ASKA EVA", "AVELLANEDA GRACIELA", "BRANDAN BEATRIZ", "GALVAN ISABEL( MIS 2  SOLES)", "MAGUI SALVATIERRA", "DE SEVILLA ANA", "ELIAS PALAVECINO", "JIMENEZ VANESA", "MORALES OSCAR", "RUIZ DELIA"],
-  "SABADO": ["MINISERVI DMC", "NIEVA PABLO", "RANDAZZO JUAN (POLL.R)", "ROLO CORBALA", "SERGIO ARAOZ", "TERAN ANA", "ARANDA LEYLA PAULINA", "JORRAT EMILIA", "LAZARTE MARIA", "RAMOS YULI", "ROLDAN JORGE", "TESSARI MARIA VIRGINIA", "ZELAYA SONIA", "ACOSTA LUIS", "CLARA ROSA PEREZ", "MARCHETTI MABEL", "PEREA SEGUNDO", "SCOLA DENIS"],
+  "LUNES": ["ACOSTA CYNTHIA", "ALVAREZ FATIMA", "ANA MARIA HUMACATA", "ANDRES PAOLA", "CAROLINA BLANCO", "CINTIA LEIVA", "CRISTIAN CARRISO", "DE TAFI GRANJA", "DESPENSA GUILLE", "DESPENSA MIA", "GALVAN DELICIA", "GERONIMO MARINA TAUI TAUI", "GUTIERREZ SUSANA", "LARA ACEVEDO", "MARIA PEREYRA", "PANADERIA CONSTITUCION", "PANADERIA ROCA", "PONCE RUBEN", "PUNTANO ANA", "ROSALES ISABEL", "SACABA LEYLA", "VACA EMILSE", "VERA MONICA"],
+  "MARTES": ["AMADO VANESA", "BARRIENTOS LAURA", "CECANTI MARIA", "DALMA VEGA(SCOBAR SILVINA)", "ESCOBAR SILVINA", "ESPINOSA MARIO", "GALLARDO CLAUDIA", "JUANA VILLA", "ROMANO DULIO", "SCANDARELI LUCRECIA", "URUEÑA PAMELA", "VARELA CRISTINA"],
+  "MIERCOLES": ["ACOSTA MARIA CRISTINA", "ALVARADO NELIDA", "BRITO NOELIA", "CUELLO ALBERTO", "CUELLO RAMON", "GARCIA JOSE ANTONIO", "GARGIULO CLAUDIA", "JAPAZE RODOLFO WILSON", "JAPAZE RODROLFO WILSON", "JIMENEZ RAUL", "LARA CLAUDIA", "LIZARRAGA MAYRA", "MUTHUAN  RIOJA", "MUTHUAN CORRIENTES", "MUTHUAN MARCOS PAZ", "PATRICIO MAMANI", "PONCE CECILIA", "PONCE LUIS", "ROMANO ALEJANDRA", "ROSA CISNERO", "SORAIRE MARCELO", "VILLAGRA AURI", "VIRGINIA SANTA CRUZ"],
+  "JUEVES": ["AGUILAR DANIEL", "AGUSTINA OLEA", "ALBORNOZ CARLA", "ALDERETE ARIEL", "ALDERETE FEDERICO", "ANTONIA CAZORLA", "ARIZANA TIENDA DE BEBIDAS", "DAVID ACOSTA", "DESPENSA FELIPE", "DIAZ SILVINA", "EL BARATITO BELLA VISTA", "EL TURQUITO BEATRIZ", "ELBA MARTINEZ", "FIGUEROA CRISTIAN", "FLORES SILVIA", "GOMEZ RAMON", "HECTOR GONZALEZ", "JULIAN SARACHO", "KIOSKO KIKIN", "LEDESMA MARGARITA", "MARCELA LOPEZ", "MEDINA MERCEDES", "PASCUAL ANA", "PONCE RICARDO", "ROLDAN FERNANDA", "SAUCE DIEGO", "SKINARI MARIA", "VASQUEZ MARIA JOSE"],
+  "VIERNES": ["AMAYA HUGO", "ANA CAROLINA GODOY", "ASKA EVA", "AUT.M Y K", "AVELLANEDA GRACIELA", "BRANDAN BEATRIZ", "CAMACHO ALICIA", "DE SEVILLA ANA", "ELIAS PALAVECINO", "FRIAS MARGARITA", "GALVAN ISABEL( MIS 2  SOLES)", "JIMENEZ VANESA", "LOGISTICCA Y DISTR. G Y P", "MAGUI SALVATIERRA", "MANSILLA ENRIQUE", "MOLINA ENRIQUE", "MORALES OSCAR", "PALAVECINO LORENA", "PAZ VIVIANA", "RUIZ DELIA", "SANA CAROLINA GODOY", "VERA CAROLINA"],
+  "SABADO": ["ACOSTA LUIS", "ARANDA LEYLA PAULINA", "CLARA ROSA PEREZ", "DECIMA GLADYS", "JORRAT EMILIA", "LAZARTE MARIA", "MARCHETTI MABEL", "MINISERVI DMC", "NIEVA PABLO", "NORMA LIA JUAREZ", "PEREA SEGUNDO", "RAMOS YULI", "RANDAZZO JUAN (POLL.R)", "ROLDAN JORGE", "ROLO CORBALA", "SAL LUCIANA", "SANCHEZ ROXANA", "SCOLA DENIS", "SERGIO ARAOZ", "SHORTHON AUTOSERVICIO", "TERAN ANA", "TESSARI MARIA VIRGINIA", "ZELAYA SONIA"],
 };
 
 let diaSeleccionado = 'LUNES';
@@ -1662,6 +1665,78 @@ function exportarDia() {
   XLSX.utils.book_append_sheet(wb, ws, diasNombre[diaSeleccionado]);
   XLSX.writeFile(wb, `Cobros_${diasNombre[diaSeleccionado]}_${new Date().toISOString().split('T')[0]}.xlsx`);
   toast(`Hoja de cobros ${diasNombre[diaSeleccionado]} exportada ✓`, 'ok');
+}
+
+
+function exportarUrgentes() {
+  const vFilt = document.getElementById('filter-urgentes-vendedor')?.value || '';
+  const urgentes = data.clientes
+    .filter(c => !vFilt || c.vendedorId === vFilt)
+    .map(c => ({ c, s: getClienteStats(c.id) }))
+    .filter(({ s }) => s.saldo > 0 && s.dias !== null && s.dias > 7)
+    .sort((a, b) => b.s.dias - a.s.dias);
+
+  if (!urgentes.length) { toast('No hay urgentes para exportar', 'err'); return; }
+
+  const wb = XLSX.utils.book_new();
+  const fecha = new Date().toLocaleDateString('es-AR');
+  const vendedorLabel = vFilt ? getVendedorNombre(vFilt) : 'TODOS';
+
+  // ── Una hoja por vendedor (o solo el filtrado) ──
+  const vendedoresEnUrgentes = vFilt
+    ? [data.vendedores.find(v => v.id === vFilt)].filter(Boolean)
+    : data.vendedores.filter(v => urgentes.some(({ c }) => c.vendedorId === v.id));
+
+  vendedoresEnUrgentes.forEach(vendedor => {
+    const urgVend = urgentes.filter(({ c }) => c.vendedorId === vendedor.id);
+    if (!urgVend.length) return;
+
+    const rows = [
+      [`ESTADO DE CUENTA — ${vendedor.nombre} — ${fecha}`],
+      [],
+      ['CLIENTE', 'SALDO PENDIENTE', 'FACTURA MÁS ANTIGUA PEND.', 'DÍAS PENDIENTES', 'ESTADO', '', 'DETALLE DE MOVIMIENTOS'],
+    ];
+
+    let totalVend = 0;
+
+    urgVend.forEach(({ c, s }) => {
+      totalVend += s.saldo;
+      const estadoTexto = s.dias > 14 ? 'URGENTE CRÍTICO' : 'URGENTE';
+
+      // Fila resumen del cliente
+      rows.push([c.nombre, s.saldo, s.ultimaFactura || '', s.dias, estadoTexto, '', '']);
+      rows.push(['', '', '', '', '', '', 'FECHA', 'TIPO', 'DEBE', 'HABER', 'SALDO ACUM.', 'REFERENCIA']);
+
+      // Asientos del cliente
+      const asientos = data.asientos
+        .filter(a => a.clienteId === c.id)
+        .sort((a, b) => (a.fecha || '').localeCompare(b.fecha || ''));
+      let acum = 0;
+      asientos.forEach(a => {
+        if (a.tipo === 'FACTURA') acum += (a.debe || 0);
+        else acum -= (a.haber || 0);
+        rows.push(['', '', '', '', '', '', a.fecha || '', a.tipo, a.debe || '', a.haber || '', acum, a.referencia || '']);
+      });
+      rows.push(['', '', '', '', '', '', 'SALDO ACTUAL', '', '', '', s.saldo, '']);
+      rows.push([]); // separador entre clientes
+    });
+
+    rows.push([]);
+    rows.push(['TOTAL PENDIENTE VENDEDOR', totalVend]);
+
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols'] = [
+      {wch:30},{wch:18},{wch:20},{wch:16},{wch:16},{wch:4},
+      {wch:12},{wch:14},{wch:14},{wch:14},{wch:14},{wch:16}
+    ];
+    // Nombre de hoja: máx 31 chars
+    const nombreHoja = vendedor.nombre.substring(0, 31);
+    XLSX.utils.book_append_sheet(wb, ws, nombreHoja);
+  });
+
+  const sufijo = vFilt ? `_${getVendedorNombre(vFilt)}` : '_TodosVendedores';
+  XLSX.writeFile(wb, `Urgentes${sufijo}_${new Date().toISOString().split('T')[0]}.xlsx`);
+  toast(`Estados de cuenta exportados ✓`, 'ok');
 }
 
 // ═══════════════════════════════════════════════════════
